@@ -29,24 +29,17 @@ class APIManager {
         }
     }
     
-    func addTransaction(params: [String: Any]) -> Single<[Transaction]> {
+    func addTransaction(params: [String: AnyObject]) -> Single<[Transaction]> {
         return post(params: params).flatMap{ (data) -> Single<[Transaction]> in
             return APIManager.handleDecode([Transaction].self, from: data)
         }
     }
     
-    func updateTransaction(id: Int, params: [String: Any]) -> Single<[Transaction]> {
+    func updateTransaction(id: Int, params: [String: AnyObject]) -> Single<[Transaction]> {
         return put(id: id, params: params).flatMap { (data) -> Single<[Transaction]> in
             return APIManager.handleDecode([Transaction].self, from: data)
         }
     }
-    
-    func updateTransaction2(id: Int, params: [String: AnyObject]) -> Single<[Transaction]> {
-        return put2(id: id, params: params).flatMap { (data) -> Single<[Transaction]> in
-            return APIManager.handleDecode([Transaction].self, from: data)
-        }
-    }
-    
 
     public enum DecodeError: Error, LocalizedError {
         case dataNull
@@ -106,11 +99,16 @@ class APIManager {
         }
     }
     
-    private func post(params: [String: Any]) -> Single<Data?> {
-        let headers: HTTPHeaders = [HTTPHeader(name: "Content-Type", value: "application/json")]
+    private func post(params: [String: AnyObject]) -> Single<Data?> {
+        let headers: HTTPHeaders? = [HTTPHeader(name: "Content-Type", value: "application/json")]
 
         return Single<Data?>.create { (singleEvent) -> Disposable in
-            Alamofire.Session.default.request(APIManager.host + APIManager.transaction, method: .post, parameters: params, headers: headers).responseJSON { (response) in
+            Alamofire.Session.default.request(APIManager.host + APIManager.transaction, method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers).responseJSON { (response) in
+                
+                if let httpBody = response.request?.httpBody, let JSONString = String(data: httpBody, encoding: String.Encoding.utf8) {
+                    print("httpBody = " + JSONString)
+                }
+                
                 switch response.result {
                 case .success:
                     if let jsonData = response.data , let JSONString = String(data: jsonData, encoding: String.Encoding.utf8) {
@@ -125,9 +123,16 @@ class APIManager {
         }
     }
     
-    private func put(id: Int, params: [String: Any]) -> Single<Data?> {
+    private func put(id: Int, params: [String: AnyObject]) -> Single<Data?> {
+        let headers: HTTPHeaders? = [HTTPHeader(name: "Content-Type", value: "application/json")]
+
         return Single<Data?>.create { (singleEvent) -> Disposable in
-            Alamofire.Session.default.request(APIManager.host + APIManager.transaction + "/\(id)", method: .put, parameters: params).responseJSON { (response) in
+            Alamofire.Session.default.request(APIManager.host + APIManager.transaction + "/\(id)", method: .put, parameters: params, encoding: JSONEncoding.default, headers: headers).responseJSON { (response) in
+                
+                if let httpBody = response.request?.httpBody, let JSONString = String(data: httpBody, encoding: String.Encoding.utf8) {
+                    print("httpBody = " + JSONString)
+                }
+                
                 switch response.result {
                 case .success:
                     if let jsonData = response.data , let JSONString = String(data: jsonData, encoding: String.Encoding.utf8) {
@@ -141,28 +146,4 @@ class APIManager {
             return Disposables.create()
         }
     }
-    
-    private func put2(id: Int, params: [String: AnyObject]) -> Single<Data?> {
-//        let headers = ["Content-Type": "application/json"]
-//        let headers:HTTPHeaders = HTTPHeaders
-        let headers: HTTPHeaders = ["Content-Type": "application/json"]
-
-        
-        return Single<Data?>.create { (singleEvent) -> Disposable in
-            Alamofire.Session.default.request(APIManager.host + APIManager.transaction + "/\(id)", method: .put, parameters: params, headers: nil).responseJSON { (response) in
-                switch response.result {
-                case .success:
-                    if let jsonData = response.data , let JSONString = String(data: jsonData, encoding: String.Encoding.utf8) {
-                       print("JSONString = " + JSONString)
-                    }
-                    singleEvent(.success(response.data))
-                case .failure(let error):
-                    singleEvent(.failure(error))
-                }
-            }
-            return Disposables.create()
-        }
-    }
-
-
 }

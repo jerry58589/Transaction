@@ -37,31 +37,8 @@ class InsertTransactionViewModel {
             return TransactionDetailRequestModel(name: detail.name, price: Int(detail.price)!, quantity: Int(detail.quantity)!)
         }
         
-        let requestModel = TransactionRequestModel(title: viewObject.title, description: viewObject.description, time: viewObject.time.dateStringToTimestamp(), details: [])
-        
-        var requestModelDic = requestModel.dict
-        
-        let requestDetailsDicArr = requestDetails.map { detail -> [String: AnyObject] in
-            return detail.dict
-        }
-        
-        requestModelDic.updateValue(requestDetailsDicArr as AnyObject, forKey: "details")
-        
-        return requestModelDic
-        
-    }
-
-    
-    private func genInsertTransactionRequestDic_old(_ viewObject: InsertTransactionViewObject) -> [String: Any] {
-        
-        let requestDetails = viewObject.details.filter {
-            return (Int($0.quantity) ?? 0) != 0 && (Int($0.price) ?? 0) != 0
-        }.map { detail -> TransactionDetailRequestModel in
-            return TransactionDetailRequestModel(name: detail.name, price: Int(detail.price)!, quantity: Int(detail.quantity)!)
-        }
-        
         let requestModel = TransactionRequestModel(title: viewObject.title, description: viewObject.description, time: viewObject.time.dateStringToTimestamp(), details: requestDetails)
         
-        return requestModel.dictionaryyy ?? [String: Any]()
+        return requestModel.dict
     }
 }

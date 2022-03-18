@@ -101,7 +101,6 @@ class TransactionListViewController: UIViewController {
     
     @objc private func loadData() {
         viewModel.getTransactionListViewObjects().subscribe(onSuccess: { objects in
-            print(objects)
             self.viewObject = objects
             self.updateUI()
             self.refreshControl.endRefreshing()
@@ -115,7 +114,6 @@ class TransactionListViewController: UIViewController {
         let controller = UIAlertController(title: "是否要刪除", message: "是否要刪除?", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "是的", style: .default) { _ in
             self.viewModel.deleteTransactionViewObject(id: sender.tag).subscribe(onSuccess: { objects in
-                print(objects)
                 self.viewObject = objects
                 self.updateUI()
             }, onFailure: { err in

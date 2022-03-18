@@ -8,8 +8,9 @@
 import Foundation
 
 extension Encodable {
-    var dictionaryyy: [String: Any]? {
-        guard let data = try? JSONEncoder().encode(self) else { return nil }
-        return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
+    var dict: [String: AnyObject] {
+        guard let data = try? JSONEncoder().encode(self) else { return [:] }
+        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject] else { return [:] }
+        return json
     }
 }

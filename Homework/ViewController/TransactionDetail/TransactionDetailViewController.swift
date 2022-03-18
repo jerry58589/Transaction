@@ -126,8 +126,6 @@ class TransactionDetailViewController: UIViewController {
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         self.view.addGestureRecognizer(tap)
         addBtn.isHidden = true
-//        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Back", style: .done, target: self, action: #selector(backPressed))
-
         
         view.addSubview(titleLabel)
         view.addSubview(titleTextField)
@@ -238,8 +236,6 @@ class TransactionDetailViewController: UIViewController {
         
         if let myViewObject = viewObject {
             viewModel.editTransactionViewObject(viewObject: myViewObject).subscribe(onSuccess: { objects in
-                print(objects)
-                
                 if objects == "okok" {
                     self.navigationController?.popViewController(animated: true)
                 }
@@ -248,26 +244,6 @@ class TransactionDetailViewController: UIViewController {
                 
             }).disposed(by: self.disposeBag)
         }
-        
-        
-        
-        // ok
-//        if let myViewObject = viewObject {
-//            let url = URL(string: "https://e-app-testing-z.herokuapp.com/transaction/\(myViewObject.id)")!
-//            var request = URLRequest(url: url)
-//            request.httpMethod = "PUT"
-//            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//            let encoder = JSONEncoder()
-//            let data = try? encoder.encode(genTransactionRequest(myViewObject))
-//            request.httpBody = data
-//            URLSession.shared.dataTask(with: request) { data, response, error in
-//                if let jsonData = data , let JSONString = String(data: jsonData, encoding: String.Encoding.utf8) {
-//                   print("JSONString = " + JSONString)
-//                }
-//            }.resume()
-//
-//        }
-        
     }
     
     private func genTransactionRequest(_ viewObject: TransactionDetailViewObject) -> TransactionRequestModel {

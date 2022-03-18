@@ -42,7 +42,6 @@ class InsertTransactionTableViewCell: UITableViewCell {
         let textField = UITextField(frame: CGRect.zero)
         textField.placeholder = "Name"
         textField.accessibilityIdentifier = TextFieldIdentifier.name.rawValue
-//        textField.setTextFieldUI()
         return textField
     }()
     
@@ -51,7 +50,6 @@ class InsertTransactionTableViewCell: UITableViewCell {
         textField.placeholder = "Quantity"
         textField.accessibilityIdentifier = TextFieldIdentifier.quantity.rawValue
         textField.keyboardType = .numberPad
-//        textField.setTextFieldUI()
         return textField
     }()
     
@@ -60,7 +58,6 @@ class InsertTransactionTableViewCell: UITableViewCell {
         textField.placeholder = "Price"
         textField.accessibilityIdentifier = TextFieldIdentifier.price.rawValue
         textField.keyboardType = .numberPad
-//        textField.setTextFieldUI()
         return textField
     }()
     

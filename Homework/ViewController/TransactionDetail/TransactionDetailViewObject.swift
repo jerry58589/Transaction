@@ -14,9 +14,3 @@ struct TransactionDetailViewObject: Codable {
     var time: String = ""
     var details: [InsertTransactionCellViewObject] = []
 }
-
-//struct TransactionDetailCellViewObject: Codable {
-//    var name: String = ""
-//    var price: String = ""
-//    var quantity: String = ""
-//}

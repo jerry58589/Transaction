@@ -121,7 +121,6 @@ class InsertTransactionViewController: UIViewController {
         self.view.backgroundColor = UIColor.white
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         self.view.addGestureRecognizer(tap)
-//        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Back", style: .done, target: self, action: #selector(backPressed))
 
         view.addSubview(titleLabel)
         view.addSubview(titleTextField)
@@ -196,7 +195,6 @@ class InsertTransactionViewController: UIViewController {
 
     @objc private func donePressed() {
         viewModel.addTransactionViewObject(viewObject: viewObject).subscribe(onSuccess: { objects in
-            print(objects)
             
             if objects == "okok" {
                 self.navigationController?.popViewController(animated: true)
@@ -206,10 +204,6 @@ class InsertTransactionViewController: UIViewController {
 
         }).disposed(by: self.disposeBag)
     }
-    
-//    @objc private func backPressed() {
-//        self.navigationController?.popViewController(animated: true)
-//    }
     
     @objc private func addBtnPressed(_ sender: UIButton) {
         viewObject.details.append(InsertTransactionCellViewObject(name: "", price: "", quantity: ""))
