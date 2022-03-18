@@ -10,7 +10,7 @@ import RxSwift
 
 class TransactionDetailViewController: UIViewController {
 
-    #warning("DOTO: Transaction Detail ")
+    #warning("DOTO: Transaction Detail OK")
     
     var viewObject: TransactionDetailViewObject?
     private let viewModel: TransactionDetailViewModel
