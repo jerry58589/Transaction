@@ -138,21 +138,21 @@ class TransactionDetailViewController: UIViewController {
         
         titleLabel.snp.makeConstraints { (make) in
             make.height.equalTo(30)
-            make.width.equalTo(0).priority(250)
+            make.width.equalTo(110)
             make.left.equalToSuperview().inset(30)
             make.top.equalToSuperview().inset(120)
         }
         
         descriptionLabel.snp.makeConstraints { (make) in
             make.height.equalTo(titleLabel.snp.height)
-            make.width.equalTo(0).priority(250)
+            make.width.equalTo(titleLabel)
             make.left.equalTo(titleLabel.snp.left)
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
         }
         
         timeLabel.snp.makeConstraints { (make) in
             make.height.equalTo(titleLabel.snp.height)
-            make.width.equalTo(0).priority(250)
+            make.width.equalTo(titleLabel)
             make.left.equalTo(titleLabel.snp.left)
             make.top.equalTo(descriptionLabel.snp.bottom).offset(20)
         }
