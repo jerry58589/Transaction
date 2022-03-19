@@ -217,6 +217,7 @@ class InsertTransactionViewController: UIViewController {
     
     @objc private func pickerAction(_ sender: UIDatePicker) {
         timeTextField.text = Int(sender.date.timeIntervalSince1970).timestampDateStr
+        viewObject.time = timeTextField.text ?? ""
     }
 
     
