@@ -53,7 +53,7 @@ class TransactionListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         initView()
-
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -100,34 +100,57 @@ class TransactionListViewController: UIViewController {
     }
     
     @objc private func loadData() {
-        viewModel.getTransactionListViewObjects().subscribe(onSuccess: { objects in
-            self.viewObject = objects
-            self.updateUI()
-            self.refreshControl.endRefreshing()
-        }, onFailure: { err in
-            print(err)
-        }).disposed(by: disposeBag)
+        if AppDelegate.hasNetwork {
+            viewModel.getTransactionListViewObjects().subscribe(onSuccess: { objects in
+                self.viewObject = objects
+                self.updateUI()
+                self.refreshControl.endRefreshing()
+            }, onFailure: { err in
+                print(err)
+            }).disposed(by: disposeBag)
+        }
+        else {
+            self.viewModel.getDBTransactionListViewObject().subscribe(onSuccess: { objects in
+                self.viewObject = objects
+                self.updateUI()
+                self.refreshControl.endRefreshing()
+            }, onFailure: { err in
+                print(err)
+            }).disposed(by: self.disposeBag)
+        }
+        
     }
     
-    @objc func deleteBtnPressed(_ sender: UIButton) {
+    @objc private func deleteBtnPressed(_ sender: UIButton) {
         
         let controller = UIAlertController(title: "是否要刪除", message: "是否要刪除?", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "是的", style: .default) { _ in
-            self.viewModel.deleteTransactionViewObject(id: sender.tag).subscribe(onSuccess: { objects in
-                self.viewObject = objects
-                self.updateUI()
-            }, onFailure: { err in
-                print(err)
-
-            }).disposed(by: self.disposeBag)
+            
+            if AppDelegate.hasNetwork {
+                self.viewModel.deleteTransactionViewObject(id: sender.tag).subscribe(onSuccess: { objects in
+                    self.viewObject = objects
+                    self.updateUI()
+                }, onFailure: { err in
+                    print(err)
+                }).disposed(by: self.disposeBag)
+            }
+            else {
+                self.viewModel.deleteDBTransactionViewObject(id: sender.tag).subscribe(onSuccess: { objects in
+                    self.viewObject = objects
+                    self.updateUI()
+                }, onFailure: { err in
+                    print(err)
+                }).disposed(by: self.disposeBag)
+            }
         }
+        
         controller.addAction(okAction)
         let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
         controller.addAction(cancelAction)
         present(controller, animated: true, completion: nil)
     }
     
-    @objc func addBtnPressed(_ sender: UIButton) {
+    @objc private func addBtnPressed(_ sender: UIButton) {
         self.navigationController?.pushViewController(InsertTransactionViewController(), animated: true)
     }
 
@@ -175,9 +198,6 @@ extension TransactionListViewController: UITableViewDelegate, UITableViewDataSou
         
         return headerView
     }
-    
-    
-    
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = TransactionDetailViewController()

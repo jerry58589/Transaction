@@ -10,16 +10,18 @@ import RxSwift
 
 class TransactionListViewModel {
 
-    var disposeBag:DisposeBag = .init()
+    var disposeBag: DisposeBag = .init()
     private var transactions = [Transaction]()
 
     @Inject private var apiManager: APIManager
     @Inject private var dbManager: DBManager
 
+    // #MARK: Api func
     func getTransactionListViewObjects() -> Single<TransactionListViewObject> {
         return apiManager.getTransactions().map { (transactions) -> TransactionListViewObject in
             #warning("DOTO: make TransactionListViewObject then sort sections by time OK")
             self.transactions = transactions
+            let _ = self.updateDB()
             return self.genTransactionListViewObject(transactions: transactions)
         }.observe(on: MainScheduler.instance)
     }
@@ -27,10 +29,39 @@ class TransactionListViewModel {
     func deleteTransactionViewObject(id: Int) -> Single<TransactionListViewObject> {
         return apiManager.deleteTransaction(id: id).map { (transactions) -> TransactionListViewObject in
             self.transactions = transactions
+            let _ = self.updateDB()
             return self.genTransactionListViewObject(transactions: transactions)
         }.observe(on: MainScheduler.instance)
     }
     
+    // #MARK: DB func
+    func testDB() {
+        dbManager.test1()
+    }
+    
+    func updateDB() -> Single<TransactionListViewObject> {
+        return dbManager.updateTransactionList(transactions: transactions).map { (transactions) -> TransactionListViewObject in
+            self.transactions = transactions
+            return self.genTransactionListViewObject(transactions: transactions)
+        }.observe(on: MainScheduler.instance)
+    }
+    
+    func getDBTransactionListViewObject() -> Single<TransactionListViewObject> {
+        return dbManager.getTransactionList().map { (transactions) -> TransactionListViewObject in
+            self.transactions = transactions
+            return self.genTransactionListViewObject(transactions: transactions)
+        }.observe(on: MainScheduler.instance)
+    }
+    
+    func deleteDBTransactionViewObject(id: Int) -> Single<TransactionListViewObject> {
+        return dbManager.deleteTransaction(id: id).map { (transactions) -> TransactionListViewObject in
+            self.transactions = transactions
+            let _ = self.updateDB()
+            return self.genTransactionListViewObject(transactions: transactions)
+        }.observe(on: MainScheduler.instance)
+    }
+
+    // #MARK: other func
     private func genTransactionListViewObject(transactions: [Transaction]) -> TransactionListViewObject {
         var sections = [TransactionListSectionViewObject]()
         var sum = 0
@@ -63,6 +94,5 @@ class TransactionListViewModel {
                 
         return .init(id: id, title: transaction?.title ?? "", description: transaction?.description ?? "", time: (transaction?.time.timestampDateStr ?? ""), details: details)
     }
-    
 
 }

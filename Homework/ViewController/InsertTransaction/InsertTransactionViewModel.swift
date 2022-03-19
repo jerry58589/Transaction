@@ -17,18 +17,33 @@ enum TextFieldIdentifier: String {
     case quantity = "quantity"
 }
 
+enum ApiStatus {
+    case success
+    case failed
+}
+
 class InsertTransactionViewModel {
 
     var disposeBag:DisposeBag = .init()
 
     @Inject private var apiManager: APIManager
+    @Inject private var dbManager: DBManager
 
-    func addTransactionViewObject(viewObject: InsertTransactionViewObject) -> Single<String> {
-        return apiManager.addTransaction(params: genTransactionRequestDic(viewObject)).map { (transactions) -> String in
-            return "okok"
+    // #MARK: Api func
+    func addTransactionViewObject(viewObject: InsertTransactionViewObject) -> Single<ApiStatus> {
+        return apiManager.addTransaction(params: genTransactionRequestDic(viewObject)).map { (transactions) -> ApiStatus in
+            return .success
         }.observe(on: MainScheduler.instance)
     }
     
+    // #MARK: DB func
+    func addDBTransactionViewObject(viewObject: InsertTransactionViewObject) -> Single<ApiStatus> {
+        return dbManager.addTransaction(transaction: genTransaction(viewObject)).map { (transactions) -> ApiStatus in
+            return .success
+        }.observe(on: MainScheduler.instance)
+    }
+    
+    // #MARK: other func
     private func genTransactionRequestDic(_ viewObject: InsertTransactionViewObject) -> [String: AnyObject] {
         
         let requestDetails = viewObject.details.filter {
@@ -41,4 +56,18 @@ class InsertTransactionViewModel {
         
         return requestModel.dict
     }
+    
+    private func genTransaction(_ viewObject: InsertTransactionViewObject) -> Transaction {
+        let transactionDetails = viewObject.details.filter {
+            return (Int($0.quantity) ?? 0) != 0 && (Int($0.price) ?? 0) != 0
+        }.map { detail -> TransactionDetail in
+            return .init(name: detail.name, quantity: Int(detail.price)!, price: Int(detail.quantity)!)
+        }
+        
+        let id = (dbManager.existsID.max() ?? 999) + 1
+        let transaction = Transaction.init(id: id, time: viewObject.time.dateStringToTimestamp(), title: viewObject.title, description: viewObject.description, details: transactionDetails)
+        
+        return transaction
+    }
+    
 }

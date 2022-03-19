@@ -234,29 +234,30 @@ class TransactionDetailViewController: UIViewController {
     }
     
     @objc private func donePressed() {
-        
-        if let myViewObject = viewObject {
-            viewModel.editTransactionViewObject(viewObject: myViewObject).subscribe(onSuccess: { objects in
-                if objects == "okok" {
-                    self.navigationController?.popViewController(animated: true)
-                }
-            }, onFailure: { err in
-                print(err)
-                
-            }).disposed(by: self.disposeBag)
+        if AppDelegate.hasNetwork {
+            if let myViewObject = viewObject {
+                viewModel.editTransactionViewObject(viewObject: myViewObject).subscribe(onSuccess: { status in
+                    if status == .success {
+                        self.navigationController?.popViewController(animated: true)
+                    }
+                }, onFailure: { err in
+                    print(err)
+                    
+                }).disposed(by: self.disposeBag)
+            }
         }
-    }
-    
-    private func genTransactionRequest(_ viewObject: TransactionDetailViewObject) -> TransactionRequestModel {
-        let requestDetails = viewObject.details.filter {
-            return (Int($0.quantity)) != 0 && (Int($0.price)) != 0
-        }.map { detail -> TransactionDetailRequestModel in
-            return TransactionDetailRequestModel(name: detail.name, price: Int(detail.price)!, quantity: Int(detail.quantity)!)
+        else {
+            if let myViewObject = viewObject {
+                viewModel.editDBTransactionViewObject(viewObject: myViewObject).subscribe(onSuccess: { status in
+                    if status == .success {
+                        self.navigationController?.popViewController(animated: true)
+                    }
+                }, onFailure: { err in
+                    print(err)
+                    
+                }).disposed(by: self.disposeBag)
+            }
         }
-        
-        let requestModel = TransactionRequestModel(title: viewObject.title, description: viewObject.description, time: viewObject.time.dateStringToTimestamp(), details: requestDetails)
-
-        return requestModel
     }
 }
 

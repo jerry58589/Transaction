@@ -194,15 +194,29 @@ class InsertTransactionViewController: UIViewController {
     }
 
     @objc private func donePressed() {
-        viewModel.addTransactionViewObject(viewObject: viewObject).subscribe(onSuccess: { objects in
-            
-            if objects == "okok" {
-                self.navigationController?.popViewController(animated: true)
-            }
-        }, onFailure: { err in
-            print(err)
+        if AppDelegate.hasNetwork {
+            viewModel.addTransactionViewObject(viewObject: viewObject).subscribe(onSuccess: { status in
+                
+                if status == .success {
+                    self.navigationController?.popViewController(animated: true)
+                }
+            }, onFailure: { err in
+                print(err)
+                
+            }).disposed(by: self.disposeBag)
+        }
+        else {
+            viewModel.addDBTransactionViewObject(viewObject: viewObject).subscribe(onSuccess: { status in
+                
+                if status == .success {
+                    self.navigationController?.popViewController(animated: true)
+                }
+            }, onFailure: { err in
+                print(err)
+                
+            }).disposed(by: self.disposeBag)
 
-        }).disposed(by: self.disposeBag)
+        }
     }
     
     @objc private func addBtnPressed(_ sender: UIButton) {

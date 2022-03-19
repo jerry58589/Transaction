@@ -6,13 +6,30 @@
 //
 
 import UIKit
+import Network
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    private let monitor = NWPathMonitor()
+    static var hasNetwork = false
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         Resolver.shareInstance.setupFactories()
+        
+        monitor.pathUpdateHandler = { path in
+            if path.status == .satisfied {
+                NSLog("mj add ========= hasNetwork")
+                AppDelegate.hasNetwork = true
+            }
+            else {
+                NSLog("mj add ========= no Network")
+                AppDelegate.hasNetwork = false
+            }
+        }
+        
+        monitor.start(queue: DispatchQueue.global())
+        
         return true
     }
 
