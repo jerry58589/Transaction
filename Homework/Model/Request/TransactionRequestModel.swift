@@ -11,11 +11,6 @@ struct TransactionRequestModel: Codable {
     let title: String
     let description: String
     let time: Int
-    let details: [TransactionDetailRequestModel]
+    let details: [TransactionDetail]
 }
 
-struct TransactionDetailRequestModel: Codable {
-    let name: String
-    let price: Int
-    let quantity: Int
-}

@@ -48,8 +48,8 @@ class InsertTransactionViewModel {
         
         let requestDetails = viewObject.details.filter {
             return (Int($0.quantity) ?? 0) != 0 && (Int($0.price) ?? 0) != 0
-        }.map { detail -> TransactionDetailRequestModel in
-            return TransactionDetailRequestModel(name: detail.name, price: Int(detail.price)!, quantity: Int(detail.quantity)!)
+        }.map { detail -> TransactionDetail in
+            return TransactionDetail(name: detail.name, quantity: Int(detail.quantity)!, price: Int(detail.price)!)
         }
         
         let requestModel = TransactionRequestModel(title: viewObject.title, description: viewObject.description, time: viewObject.time.dateStringToTimestamp(), details: requestDetails)
