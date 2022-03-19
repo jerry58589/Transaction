@@ -35,10 +35,6 @@ class TransactionListViewModel {
     }
     
     // #MARK: DB func
-    func testDB() {
-        dbManager.test1()
-    }
-    
     func updateDB() -> Single<TransactionListViewObject> {
         return dbManager.updateTransactionList(transactions: transactions).map { (transactions) -> TransactionListViewObject in
             self.transactions = transactions
