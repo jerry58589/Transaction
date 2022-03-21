@@ -98,6 +98,17 @@ class InsertTransactionViewController: UIViewController {
         return datePicker
     }()
 
+    private lazy var doneBtn: UIBarButtonItem = {
+        let doneBtn = UIBarButtonItem()
+        doneBtn.title = "Done"
+        doneBtn.style = .done
+        
+        doneBtn.rx.tap.subscribe(onNext: {
+            self.donePressed()
+        }).disposed(by: disposeBag)
+
+        return doneBtn
+    }()
     
     public init(viewModel: InsertTransactionViewModel = .init()) {
         self.viewModel = viewModel
