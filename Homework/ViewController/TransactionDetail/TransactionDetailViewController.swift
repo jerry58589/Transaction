@@ -6,7 +6,9 @@
 //
 
 import UIKit
+import SnapKit
 import RxSwift
+import RxCocoa
 
 class TransactionDetailViewController: UIViewController {
 
@@ -81,7 +83,11 @@ class TransactionDetailViewController: UIViewController {
     private lazy var addBtn: UIButton = {
         let addBtn = UIButton(type: .custom)
         addBtn.setImage(UIImage(named: "addBtn"), for: .normal)
-        addBtn.addTarget(self, action: #selector(addBtnPressed(_:)), for: .touchUpInside)
+
+        addBtn.rx.tap.subscribe(onNext: {
+            self.addBtnPressed(addBtn)
+        }).disposed(by: disposeBag)
+
         return addBtn
     }()
     
@@ -98,6 +104,30 @@ class TransactionDetailViewController: UIViewController {
         datePicker.addTarget(self, action: #selector(pickerAction(_:)), for: .valueChanged)
 
         return datePicker
+    }()
+    
+    private lazy var doneBtn: UIBarButtonItem = {
+        let doneBtn = UIBarButtonItem()
+        doneBtn.title = "Done"
+        doneBtn.style = .done
+        
+        doneBtn.rx.tap.subscribe(onNext: {
+            self.donePressed()
+        }).disposed(by: disposeBag)
+
+        return doneBtn
+    }()
+    
+    private lazy var editBtn: UIBarButtonItem = {
+        let editBtn = UIBarButtonItem()
+        editBtn.title = "Edit"
+        editBtn.style = .done
+        
+        editBtn.rx.tap.subscribe(onNext: {
+            self.editPressed()
+        }).disposed(by: disposeBag)
+
+        return editBtn
     }()
 
 
@@ -121,9 +151,15 @@ class TransactionDetailViewController: UIViewController {
         title = "Transaction Detail"
         self.view.backgroundColor = UIColor.white
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .done, target: self, action: #selector(editPressed))
+        self.navigationItem.rightBarButtonItem = editBtn
         self.view.backgroundColor = UIColor.white
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        
+        let tap = UITapGestureRecognizer()
+        tap.rx.event.subscribe(onNext: { (tap) in
+            self.dismissKeyboard()
+        })
+        .disposed(by: disposeBag)
+
         self.view.addGestureRecognizer(tap)
         addBtn.isHidden = true
         
@@ -194,7 +230,7 @@ class TransactionDetailViewController: UIViewController {
     }
 
     private func setEditModeUI() {
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(donePressed))
+        self.navigationItem.rightBarButtonItem = doneBtn
         addBtn.isHidden = !isEditMode
         
         titleTextField.setTextFieldUI()
@@ -209,16 +245,16 @@ class TransactionDetailViewController: UIViewController {
         detailTableView.reloadData()
     }
     
-    @objc private func dismissKeyboard() {
+    private func dismissKeyboard() {
         view.endEditing(true)
     }
     
-    @objc private func addBtnPressed(_ sender: UIButton) {
+    private func addBtnPressed(_ sender: UIButton) {
         viewObject?.details.append(InsertTransactionCellViewObject(name: "", price: "", quantity: ""))
         detailTableView.reloadData()
     }
     
-    @objc private func deleteBtnPressed(_ sender: UIButton) {
+    private func deleteBtnPressed(_ sender: UIButton) {
         viewObject?.details.remove(at: sender.tag)
         detailTableView.reloadData()
     }
@@ -228,12 +264,12 @@ class TransactionDetailViewController: UIViewController {
         viewObject?.time = timeTextField.text ?? ""
     }
     
-    @objc private func editPressed() {
+    private func editPressed() {
         isEditMode = true
         setEditModeUI()
     }
     
-    @objc private func donePressed() {
+    private func donePressed() {
         if AppDelegate.hasNetwork {
             if let myViewObject = viewObject {
                 viewModel.editTransactionViewObject(viewObject: myViewObject).subscribe(onSuccess: { status in
@@ -271,7 +307,11 @@ extension TransactionDetailViewController: UITableViewDelegate, UITableViewDataS
         let reuseIdentifier = "\(indexPath.row)"
         let cell = InsertTransactionTableViewCell(style: .default, reuseIdentifier: reuseIdentifier)
         cell.selectionStyle = .none
-        cell.deleteBtn.addTarget(self, action: #selector(deleteBtnPressed(_:)), for: .touchUpInside)
+        
+        cell.deleteBtn.rx.tap.subscribe(onNext: {
+            self.deleteBtnPressed(cell.deleteBtn)
+        }).disposed(by: disposeBag)
+
         cell.updateView((viewObject?.details[indexPath.row]))
         cell.setTag(row: indexPath.row)
         cell.nameTextField.delegate = self

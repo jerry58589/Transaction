@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import RxSwift
+import RxCocoa
 
 class TransactionListViewController: UIViewController {
 
@@ -36,7 +37,11 @@ class TransactionListViewController: UIViewController {
     private lazy var addBtn: UIButton = {
         let addBtn = UIButton(type: .custom)
         addBtn.setImage(UIImage(named: "addBtn"), for: .normal)
-        addBtn.addTarget(self, action: #selector(addBtnPressed(_:)), for: .touchUpInside)
+        
+        addBtn.rx.tap.subscribe(onNext: {
+            self.addBtnPressed(addBtn)
+        }).disposed(by: disposeBag)
+        
         return addBtn
     }()
 
@@ -121,7 +126,7 @@ class TransactionListViewController: UIViewController {
         
     }
     
-    @objc private func deleteBtnPressed(_ sender: UIButton) {
+    private func deleteBtnPressed(_ sender: UIButton) {
         
         let controller = UIAlertController(title: "是否要刪除", message: "是否要刪除?", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "是的", style: .default) { _ in
@@ -150,7 +155,7 @@ class TransactionListViewController: UIViewController {
         present(controller, animated: true, completion: nil)
     }
     
-    @objc private func addBtnPressed(_ sender: UIButton) {
+    private func addBtnPressed(_ sender: UIButton) {
         self.navigationController?.pushViewController(InsertTransactionViewController(), animated: true)
     }
 
@@ -194,7 +199,9 @@ extension TransactionListViewController: UITableViewDelegate, UITableViewDataSou
         let sectionViewObject = self.viewObject?.sections[section] ?? TransactionListSectionViewObject(title: "sectionViewObject error", time: "1970/01/01", id: 0, cells: [])
         let headerView = TransactionListSectionView(frame: CGRect.zero, transactionListItemViewObject: sectionViewObject)
         
-        headerView.deleteBtn.addTarget(self, action: #selector(deleteBtnPressed(_:)), for: .touchUpInside)
+        headerView.deleteBtn.rx.tap.subscribe(onNext: {
+            self.deleteBtnPressed(headerView.deleteBtn)
+        }).disposed(by: disposeBag)
         
         return headerView
     }

@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 
 class InsertTransactionViewController: UIViewController {
 
@@ -74,7 +75,10 @@ class InsertTransactionViewController: UIViewController {
     private lazy var addBtn: UIButton = {
         let addBtn = UIButton(type: .custom)
         addBtn.setImage(UIImage(named: "addBtn"), for: .normal)
-        addBtn.addTarget(self, action: #selector(addBtnPressed(_:)), for: .touchUpInside)
+        addBtn.rx.tap.subscribe(onNext: {
+            self.addBtnPressed(addBtn)
+        }).disposed(by: disposeBag)
+        
         return addBtn
     }()
     
@@ -117,9 +121,15 @@ class InsertTransactionViewController: UIViewController {
     
     private func initView() {
         title = "Insert Transaction"
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(donePressed))
+        self.navigationItem.rightBarButtonItem = doneBtn
         self.view.backgroundColor = UIColor.white
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        
+        let tap = UITapGestureRecognizer()
+        tap.rx.event.subscribe(onNext: { (tap) in
+            self.dismissKeyboard()
+        })
+        .disposed(by: disposeBag)
+
         self.view.addGestureRecognizer(tap)
 
         view.addSubview(titleLabel)
@@ -189,11 +199,11 @@ class InsertTransactionViewController: UIViewController {
         
     }
     
-    @objc private func dismissKeyboard() {
+    private func dismissKeyboard() {
         view.endEditing(true)
     }
 
-    @objc private func donePressed() {
+    private func donePressed() {
         if AppDelegate.hasNetwork {
             viewModel.addTransactionViewObject(viewObject: viewObject).subscribe(onSuccess: { status in
                 
@@ -219,12 +229,12 @@ class InsertTransactionViewController: UIViewController {
         }
     }
     
-    @objc private func addBtnPressed(_ sender: UIButton) {
+    private func addBtnPressed(_ sender: UIButton) {
         viewObject.details.append(InsertTransactionCellViewObject(name: "", price: "", quantity: ""))
         tableView.reloadData()
     }
     
-    @objc private func deleteBtnPressed(_ sender: UIButton) {
+    private func deleteBtnPressed(_ sender: UIButton) {
         viewObject.details.remove(at: sender.tag)
         tableView.reloadData()
     }
@@ -247,7 +257,10 @@ extension InsertTransactionViewController: UITableViewDelegate, UITableViewDataS
         let reuseIdentifier = "\(indexPath.row)"
         let cell = InsertTransactionTableViewCell(style: .default, reuseIdentifier: reuseIdentifier)
         cell.selectionStyle = .none
-        cell.deleteBtn.addTarget(self, action: #selector(deleteBtnPressed(_:)), for: .touchUpInside)
+        cell.deleteBtn.rx.tap.subscribe(onNext: {
+            self.deleteBtnPressed(cell.deleteBtn)
+        }).disposed(by: disposeBag)
+        
         cell.updateView((viewObject.details[indexPath.row]))
         cell.setTag(row: indexPath.row)
         cell.nameTextField.delegate = self
