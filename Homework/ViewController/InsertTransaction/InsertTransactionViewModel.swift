@@ -34,6 +34,7 @@ class InsertTransactionViewModel {
         return apiManager.addTransaction(params: genTransactionRequestDic(viewObject)).map { (transactions) -> ApiStatus in
             return .success
         }.observe(on: MainScheduler.instance)
+        .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
     }
     
     // #MARK: DB func
@@ -41,6 +42,7 @@ class InsertTransactionViewModel {
         return dbManager.addTransaction(transaction: genTransaction(viewObject)).map { (transactions) -> ApiStatus in
             return .success
         }.observe(on: MainScheduler.instance)
+            .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
     }
     
     // #MARK: other func

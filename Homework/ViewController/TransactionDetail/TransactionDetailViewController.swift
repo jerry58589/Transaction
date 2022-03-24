@@ -272,9 +272,9 @@ class TransactionDetailViewController: UIViewController {
     private func donePressed() {
         if AppDelegate.hasNetwork {
             if let myViewObject = viewObject {
-                viewModel.editTransactionViewObject(viewObject: myViewObject).subscribe(onSuccess: { status in
+                viewModel.editTransactionViewObject(viewObject: myViewObject).subscribe(onSuccess: { [weak self] status in
                     if status == .success {
-                        self.navigationController?.popViewController(animated: true)
+                        self?.navigationController?.popViewController(animated: true)
                     }
                 }, onFailure: { err in
                     print(err)
@@ -284,9 +284,9 @@ class TransactionDetailViewController: UIViewController {
         }
         else {
             if let myViewObject = viewObject {
-                viewModel.editDBTransactionViewObject(viewObject: myViewObject).subscribe(onSuccess: { status in
+                viewModel.editDBTransactionViewObject(viewObject: myViewObject).subscribe(onSuccess: { [weak self] status in
                     if status == .success {
-                        self.navigationController?.popViewController(animated: true)
+                        self?.navigationController?.popViewController(animated: true)
                     }
                 }, onFailure: { err in
                     print(err)

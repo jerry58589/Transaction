@@ -24,6 +24,7 @@ class TransactionListViewModel {
             let _ = self.updateDB()
             return self.genTransactionListViewObject(transactions: transactions)
         }.observe(on: MainScheduler.instance)
+            .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
     }
     
     func deleteTransactionViewObject(id: Int) -> Single<TransactionListViewObject> {
@@ -32,6 +33,7 @@ class TransactionListViewModel {
             let _ = self.updateDB()
             return self.genTransactionListViewObject(transactions: transactions)
         }.observe(on: MainScheduler.instance)
+            .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
     }
     
     // #MARK: DB func
@@ -40,6 +42,7 @@ class TransactionListViewModel {
             self.transactions = transactions
             return self.genTransactionListViewObject(transactions: transactions)
         }.observe(on: MainScheduler.instance)
+            .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
     }
     
     func getDBTransactionListViewObject() -> Single<TransactionListViewObject> {
@@ -47,6 +50,7 @@ class TransactionListViewModel {
             self.transactions = transactions
             return self.genTransactionListViewObject(transactions: transactions)
         }.observe(on: MainScheduler.instance)
+            .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
     }
     
     func deleteDBTransactionViewObject(id: Int) -> Single<TransactionListViewObject> {
@@ -55,6 +59,7 @@ class TransactionListViewModel {
             let _ = self.updateDB()
             return self.genTransactionListViewObject(transactions: transactions)
         }.observe(on: MainScheduler.instance)
+            .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
     }
 
     // #MARK: other func

@@ -216,10 +216,10 @@ class InsertTransactionViewController: UIViewController {
 
     private func donePressed() {
         if AppDelegate.hasNetwork {
-            viewModel.addTransactionViewObject(viewObject: viewObject).subscribe(onSuccess: { status in
+            viewModel.addTransactionViewObject(viewObject: viewObject).subscribe(onSuccess: { [weak self] status in
                 
                 if status == .success {
-                    self.navigationController?.popViewController(animated: true)
+                    self?.navigationController?.popViewController(animated: true)
                 }
             }, onFailure: { err in
                 print(err)
@@ -227,10 +227,10 @@ class InsertTransactionViewController: UIViewController {
             }).disposed(by: self.disposeBag)
         }
         else {
-            viewModel.addDBTransactionViewObject(viewObject: viewObject).subscribe(onSuccess: { status in
+            viewModel.addDBTransactionViewObject(viewObject: viewObject).subscribe(onSuccess: { [weak self] status in
                 
                 if status == .success {
-                    self.navigationController?.popViewController(animated: true)
+                    self?.navigationController?.popViewController(animated: true)
                 }
             }, onFailure: { err in
                 print(err)
