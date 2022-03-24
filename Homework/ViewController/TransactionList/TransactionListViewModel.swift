@@ -17,7 +17,7 @@ class TransactionListViewModel {
     @Inject private var dbManager: DBManager
 
     // #MARK: Api func
-    func getTransactionListViewObjects() -> Single<TransactionListViewObject> {
+    private func getApiTransactionListViewObjects() -> Single<TransactionListViewObject> {
         return apiManager.getTransactions().map { (transactions) -> TransactionListViewObject in
             #warning("DOTO: make TransactionListViewObject then sort sections by time OK")
             self.transactions = transactions
@@ -27,7 +27,7 @@ class TransactionListViewModel {
             .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
     }
     
-    func deleteTransactionViewObject(id: Int) -> Single<TransactionListViewObject> {
+    private func deleteApiTransactionViewObject(id: Int) -> Single<TransactionListViewObject> {
         return apiManager.deleteTransaction(id: id).map { (transactions) -> TransactionListViewObject in
             self.transactions = transactions
             let _ = self.updateDB()
@@ -37,7 +37,7 @@ class TransactionListViewModel {
     }
     
     // #MARK: DB func
-    func updateDB() -> Single<TransactionListViewObject> {
+    private func updateDB() -> Single<TransactionListViewObject> {
         return dbManager.updateTransactionList(transactions: transactions).map { (transactions) -> TransactionListViewObject in
             self.transactions = transactions
             return self.genTransactionListViewObject(transactions: transactions)
@@ -45,7 +45,7 @@ class TransactionListViewModel {
             .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
     }
     
-    func getDBTransactionListViewObject() -> Single<TransactionListViewObject> {
+    private func getDBTransactionListViewObject() -> Single<TransactionListViewObject> {
         return dbManager.getTransactionList().map { (transactions) -> TransactionListViewObject in
             self.transactions = transactions
             return self.genTransactionListViewObject(transactions: transactions)
@@ -53,7 +53,7 @@ class TransactionListViewModel {
             .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
     }
     
-    func deleteDBTransactionViewObject(id: Int) -> Single<TransactionListViewObject> {
+    private func deleteDBTransactionViewObject(id: Int) -> Single<TransactionListViewObject> {
         return dbManager.deleteTransaction(id: id).map { (transactions) -> TransactionListViewObject in
             self.transactions = transactions
             let _ = self.updateDB()
@@ -63,6 +63,24 @@ class TransactionListViewModel {
     }
 
     // #MARK: other func
+    func getTransactionListViewObjects() -> Single<TransactionListViewObject> {
+        if AppDelegate.hasNetwork {
+            return getApiTransactionListViewObjects()
+        }
+        else {
+            return getDBTransactionListViewObject()
+        }
+    }
+    
+    func deleteTransactionViewObject(id: Int) -> Single<TransactionListViewObject> {
+        if AppDelegate.hasNetwork {
+            return deleteApiTransactionViewObject(id: id)
+        }
+        else {
+            return deleteDBTransactionViewObject(id: id)
+        }
+    }
+    
     private func genTransactionListViewObject(transactions: [Transaction]) -> TransactionListViewObject {
         var sections = [TransactionListSectionViewObject]()
         var sum = 0

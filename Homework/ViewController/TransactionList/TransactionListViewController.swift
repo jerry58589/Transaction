@@ -105,25 +105,13 @@ class TransactionListViewController: UIViewController {
     }
     
     @objc private func loadData() {
-        if AppDelegate.hasNetwork {
-            viewModel.getTransactionListViewObjects().subscribe(onSuccess: { [weak self] objects in
-                self?.viewObject = objects
-                self?.updateUI()
-                self?.refreshControl.endRefreshing()
-            }, onFailure: { err in
-                print(err)
-            }).disposed(by: disposeBag)
-        }
-        else {
-            self.viewModel.getDBTransactionListViewObject().subscribe(onSuccess: { [weak self] objects in
-                self?.viewObject = objects
-                self?.updateUI()
-                self?.refreshControl.endRefreshing()
-            }, onFailure: { err in
-                print(err)
-            }).disposed(by: self.disposeBag)
-        }
-        
+        viewModel.getTransactionListViewObjects().subscribe(onSuccess: { [weak self] objects in
+            self?.viewObject = objects
+            self?.updateUI()
+            self?.refreshControl.endRefreshing()
+        }, onFailure: { err in
+            print(err)
+        }).disposed(by: disposeBag)
     }
     
     private func deleteBtnPressed(_ sender: UIButton) {
@@ -131,22 +119,12 @@ class TransactionListViewController: UIViewController {
         let controller = UIAlertController(title: "是否要刪除", message: "是否要刪除?", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "是的", style: .default) { _ in
             
-            if AppDelegate.hasNetwork {
-                self.viewModel.deleteTransactionViewObject(id: sender.tag).subscribe(onSuccess: { [weak self] objects in
-                    self?.viewObject = objects
-                    self?.updateUI()
-                }, onFailure: { err in
-                    print(err)
-                }).disposed(by: self.disposeBag)
-            }
-            else {
-                self.viewModel.deleteDBTransactionViewObject(id: sender.tag).subscribe(onSuccess: { [weak self] objects in
-                    self?.viewObject = objects
-                    self?.updateUI()
-                }, onFailure: { err in
-                    print(err)
-                }).disposed(by: self.disposeBag)
-            }
+            self.viewModel.deleteTransactionViewObject(id: sender.tag).subscribe(onSuccess: { [weak self] objects in
+                self?.viewObject = objects
+                self?.updateUI()
+            }, onFailure: { err in
+                print(err)
+            }).disposed(by: self.disposeBag)
         }
         
         controller.addAction(okAction)

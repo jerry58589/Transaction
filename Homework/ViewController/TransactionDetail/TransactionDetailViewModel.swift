@@ -16,7 +16,7 @@ class TransactionDetailViewModel {
     @Inject private var dbManager: DBManager
 
     // #MARK: Api func
-    func editTransactionViewObject(viewObject: TransactionDetailViewObject) -> Single<ApiStatus> {
+    private func editApiTransactionViewObject(viewObject: TransactionDetailViewObject) -> Single<ApiStatus> {
         
         return apiManager.updateTransaction(id: viewObject.id, params: genTransactionRequestDic(viewObject)).map { (transactions) -> ApiStatus in
             return .success
@@ -25,7 +25,7 @@ class TransactionDetailViewModel {
     }
     
     // #MARK: DB func
-    func editDBTransactionViewObject(viewObject: TransactionDetailViewObject) -> Single<ApiStatus> {
+    private func editDBTransactionViewObject(viewObject: TransactionDetailViewObject) -> Single<ApiStatus> {
         return dbManager.updateTransaction(transaction: genTransaction(viewObject)).map { (transactions) -> ApiStatus in
             return .success
         }.observe(on: MainScheduler.instance)
@@ -33,6 +33,15 @@ class TransactionDetailViewModel {
     }
 
     // #MARK: other func
+    func editTransactionViewObject(viewObject: TransactionDetailViewObject) -> Single<ApiStatus> {
+        if AppDelegate.hasNetwork {
+            return editApiTransactionViewObject(viewObject: viewObject)
+        }
+        else {
+            return editDBTransactionViewObject(viewObject: viewObject)
+        }
+    }
+    
     private func genTransactionRequestDic(_ viewObject: TransactionDetailViewObject) -> [String: AnyObject] {
         
         let requestDetails = viewObject.details.filter {
